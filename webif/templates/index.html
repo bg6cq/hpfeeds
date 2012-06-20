@@ -16,7 +16,6 @@ We tried to design a simple wire-format so that everyone is able to subscribe to
 	<p>Different feeds are separated by <i>channels</i> and support arbitrary binary payloads. This means that the channel users have to decide about the structure of data. This could for example be done by choosing a serialization format.</p>
 	<p>Access to channels is given to so-called <i>Authkeys</i> which essentially are pairs of an identifier and a secret. The secret is sent to the server by hashing it together with a per-connection nonce. This way no eavesdroppers can obtain valid credentials. Optionally the protocol can be run on top of SSL/TLS, of course.</p>
 	<p>To support multiple data sources and sinks per user we manage the Authkeys in this webinterface after a quick login with a user account. User accounts are only needed for the webinterface - to use the data feed channels, only Authkeys are necessary. Different Authkeys can be granted distinct access rights for channels.</p>
-	<p><b>The system you are accessing right now is a HP internal-only setup.</b> Every account needs to be accepted by an HP member. This means you are only eligible to register if you are an HP member or you have an agreement to get access for some specific project (e.g. GSOC).</p>
 	<br />
 
 <blockquote class="button">
@@ -27,11 +26,10 @@ We tried to design a simple wire-format so that everyone is able to subscribe to
 	{% else %}
 	<h3>Welcome to hpfeeds, {{ user.username }}.</h3>
 	<p>Please visit the <a href="http://redmine.honeynet.org/projects/hpfeeds/wiki">hpfeeds Redmine project</a> for further information on the protocol. The code and an example client is available from the <a href="https://github.com/rep/hpfeeds">git repository</a> at Github.</p>
-	<p>Every hpfeed user should keep an eye on the yet inactive registrations and accept those from fellow HP members.</p>
-	<p>Contact Mark regarding any further questions and assistance. Enjoy!</p>
+	<p>Contact Zhang Huanjie(james@ustc.edu.cn) regarding any further questions and assistance. Enjoy!</p>
 	<br />
 	<p>The feedbroker instance on this setup runs on port: 10000</p>
-	<pre>python feed.py --host hpfeeds.honeycloud.net -p 10000 -c dionaea.capture -i identifier -s secret subscribe</pre>
+	<pre>python feed.py --host hpfeeds.ustc.du.cn -p 10000 -c channel -i identifier -s secret subscribe</pre>
 	{% endif %}
       </div>
 
