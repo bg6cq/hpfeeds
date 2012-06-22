@@ -53,12 +53,18 @@ UNKNOWN } cmd_t;
 u_char *read_msg(int s) {
 	u_char *buffer;
 	u_int32_t msglen;
+	int len;
 
-	if (read(s, &msglen, 4) == -1) {
-		perror("read()");
-		exit(EXIT_FAILURE);
+	while (1) {
+		len = read(s, &msglen, 4);
+		if (len == -1) {
+			perror("read()");
+			exit(EXIT_FAILURE);
+		}
+		if (len == 0) continue;
+		if (len >0 ) break;
 	}
-
+	
 	if ((buffer = malloc(msglen)) == NULL) {
 		perror("malloc()");
 		exit(EXIT_FAILURE);
@@ -308,7 +314,6 @@ int main(int argc, char *argv[]) {
 				close(s);
 				return EXIT_SUCCESS;
 			}
-			printf("read %d, ",len);
 			if(buf[len - 1] == '\n') {
 				buf[len - 1] = 0;
 				len --;
