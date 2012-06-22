@@ -55,14 +55,10 @@ u_char *read_msg(int s) {
 	u_int32_t msglen;
 	int len;
 
-	while (1) {
-		len = read(s, &msglen, 4);
-		if (len == -1) {
-			perror("read()");
-			exit(EXIT_FAILURE);
-		}
-		if (len == 0) continue;
-		if (len >0 ) break;
+	len = read(s, &msglen, 4);
+	if (len != 4) {
+		perror("read()");
+		exit(EXIT_FAILURE);
 	}
 	
 	if ((buffer = malloc(msglen)) == NULL) {
