@@ -26,6 +26,9 @@
 #include <string.h>
 #include <unistd.h>
 
+
+#define MAXLEN 32768
+
 char *def_host="hpfeeds.ustc.edu.cn";
 char *def_port="10000";
 
@@ -40,6 +43,11 @@ S_TERMINATE
 } session_state_t;
 
 session_state_t session_state;	// global session state
+
+typedef enum {
+SUBSCRIBE,
+PUBLISH,
+UNKNOWN } cmd_t;
 
 
 u_char *read_msg(int s) {
@@ -69,15 +77,7 @@ u_char *read_msg(int s) {
 void sigh(int sig) {
 	switch (sig) {
 	case SIGINT:
-		if (session_state != S_TERMINATE) {
-			if (write(STDOUT_FILENO, "\rSIGINT, signal again to terminate now.\n", 40) == -1) {
-				perror("write()");
-				exit(EXIT_FAILURE);
-			}
-			session_state = S_TERMINATE;
-		} else {
-			exit(EXIT_SUCCESS);
-		}
+		exit(EXIT_SUCCESS);
 		break;
 	default:
 		break;
@@ -86,13 +86,16 @@ void sigh(int sig) {
 }
 
 void usage(char*progname) {
-	fprintf(stderr,"Usage: %s -h host -p port -c channel -i ident -s secret\n", progname);
+	fprintf(stderr,"Usage: %s -h host -p port [-S|-P] -c channel -i ident -s secret\n", progname);
+	fprintf(stderr,"       -S subscribe to channel, print msg to stdout\n");
+	fprintf(stderr,"       -P publish   to channel, read msg from stdin\n");
 	fprintf(stderr,"       default value:\n");
 	fprintf(stderr,"                host: %s\n",def_host);
 	fprintf(stderr,"                port: %s\n",def_port);
 	exit(0);
 }
 int main(int argc, char *argv[]) {
+	cmd_t fdcmd; 
 	hpf_msg_t *msg;
 	hpf_chunk_t *chunk;
 	u_char *data;
@@ -102,15 +105,23 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in host;
 	u_int32_t nonce = 0;
 	u_int32_t payload_len;
+	char buf[MAXLEN];
 
+	fdcmd=UNKNOWN;
 	channel = ident = secret = NULL;
 	msg = NULL;
 
 	memset(&host, 0, sizeof(struct sockaddr_in));
 	host.sin_family = AF_INET;
 
-	while ((opt = getopt(argc, argv, "c:h:i:p:s:")) != -1) {
+	while ((opt = getopt(argc, argv, "SPc:h:i:p:s:")) != -1) {
 		switch (opt) {
+		case 'S':
+			fdcmd = SUBSCRIBE;
+			break;
+		case 'P':
+			fdcmd = PUBLISH;
+			break;
 		case 'c':
 			channel = optarg;
 			break;
@@ -159,7 +170,7 @@ int main(int argc, char *argv[]) {
 	}
 	if (host.sin_port == 0)
 			host.sin_port = htons(strtoul(def_port, 0, 0));
-	if (!channel || !ident || !secret || host.sin_addr.s_addr == INADDR_ANY || host.sin_port == 0) {
+	if ( fdcmd == UNKNOWN || !channel || !ident || !secret || host.sin_addr.s_addr == INADDR_ANY || host.sin_port == 0) {
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -225,8 +236,11 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 		}
 		hpf_msg_delete(msg);
-	
-		session_state = S_SUBSCRIBE;
+
+		if (fdcmd == SUBSCRIBE) 	
+			session_state = S_SUBSCRIBE;
+		else 
+			session_state = S_PUBLISH;
 		break;
 	case S_SUBSCRIBE:
 		// send subscribe message
@@ -283,6 +297,31 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 		}
 
+		break;
+	case S_PUBLISH:
+		// send publish message
+		fprintf(stderr,"publish to channel...\n");
+		while (1) { 
+			int len;
+			len = read(STDIN_FILENO,buf,MAXLEN);
+			if (len <= 0) {  // end of file
+				close(s);
+				return EXIT_SUCCESS;
+			}
+			printf("read %d, ",len);
+			if(buf[len - 1] == '\n') {
+				buf[len - 1] = 0;
+				len --;
+			}
+			msg = hpf_msg_publish((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel),buf,len);
+			if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
+				perror("write()");
+				exit(EXIT_FAILURE);
+			}
+			hpf_msg_delete(msg);
+		}
+		
+		session_state = S_PUBLISH;
 		break;
 	case S_ERROR:
 		if (msg) {
