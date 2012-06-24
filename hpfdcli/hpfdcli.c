@@ -1,5 +1,5 @@
 /*
-  cngicli.c   
+  hpfdcli.c   
   Copyright (C) 2011 The Honeynet Project
   Copyright (C) 2011 Tillmann Werner, tillmann.werner@gmx.de
 
@@ -26,7 +26,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 #define MAXLEN 32768
 
 char *def_host="hpfeeds.ustc.edu.cn";
@@ -45,10 +44,9 @@ S_TERMINATE
 session_state_t session_state;	// global session state
 
 typedef enum {
-SUBSCRIBE,
-PUBLISH,
-UNKNOWN } cmd_t;
-
+C_SUBSCRIBE,
+C_PUBLISH,
+C_UNKNOWN } cmd_t;
 
 u_char *read_msg(int s) {
 	u_char *buffer;
@@ -65,10 +63,9 @@ u_char *read_msg(int s) {
 	}
 
 	*(u_int32_t *) buffer = msglen;
-
 	msglen = ntohl(msglen);
 
-	if (read(s, buffer + 4, msglen - 4) != msglen-4) {
+	if (read(s, buffer + 4, msglen - 4) != (msglen - 4)) {
 		perror("read()");
 		exit(EXIT_FAILURE);
 	}
@@ -97,7 +94,7 @@ void usage(char*progname) {
 	exit(0);
 }
 int main(int argc, char *argv[]) {
-	cmd_t fdcmd; 
+	cmd_t hpfdcmd; 
 	hpf_msg_t *msg;
 	hpf_chunk_t *chunk;
 	u_char *data;
@@ -109,7 +106,7 @@ int main(int argc, char *argv[]) {
 	u_int32_t payload_len;
 	char buf[MAXLEN];
 
-	fdcmd=UNKNOWN;
+	hpfdcmd = C_UNKNOWN;
 	channel = ident = secret = NULL;
 	msg = NULL;
 
@@ -119,10 +116,10 @@ int main(int argc, char *argv[]) {
 	while ((opt = getopt(argc, argv, "SPc:h:i:p:s:")) != -1) {
 		switch (opt) {
 		case 'S':
-			fdcmd = SUBSCRIBE;
+			hpfdcmd = C_SUBSCRIBE;
 			break;
 		case 'P':
-			fdcmd = PUBLISH;
+			hpfdcmd = C_PUBLISH;
 			break;
 		case 'c':
 			channel = optarg;
@@ -172,7 +169,7 @@ int main(int argc, char *argv[]) {
 	}
 	if (host.sin_port == 0)
 			host.sin_port = htons(strtoul(def_port, 0, 0));
-	if ( fdcmd == UNKNOWN || !channel || !ident || !secret || host.sin_addr.s_addr == INADDR_ANY || host.sin_port == 0) {
+	if (hpfdcmd == C_UNKNOWN || !channel || !ident || !secret || host.sin_addr.s_addr == INADDR_ANY || host.sin_port == 0) {
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -239,9 +236,9 @@ int main(int argc, char *argv[]) {
 		}
 		hpf_msg_delete(msg);
 
-		if (fdcmd == SUBSCRIBE) 	
+		if (hpfdcmd == C_SUBSCRIBE)
 			session_state = S_SUBSCRIBE;
-		else 
+		else
 			session_state = S_PUBLISH;
 		break;
 	case S_SUBSCRIBE:
@@ -322,7 +319,8 @@ int main(int argc, char *argv[]) {
 			hpf_msg_delete(msg);
 		}
 		
-		session_state = S_PUBLISH;
+		exit(EXIT_FAILURE); // oops
+	 		
 		break;
 	case S_ERROR:
 		if (msg) {
