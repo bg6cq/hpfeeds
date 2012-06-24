@@ -88,12 +88,12 @@ void sigh(int sig) {
 }
 
 void usage(char*progname) {
-	fprintf(stderr,"Usage: %s -h host -p port [-S|-P] -c channel -i ident -s secret\n", progname);
-	fprintf(stderr,"       -S subscribe to channel, print msg to stdout\n");
-	fprintf(stderr,"       -P publish   to channel, read msg from stdin\n");
-	fprintf(stderr,"       default value:\n");
-	fprintf(stderr,"                host: %s\n",def_host);
-	fprintf(stderr,"                port: %s\n",def_port);
+	fprintf(stderr, "Usage: %s -h host -p port [-S|-P] -c channel -i ident -s secret\n", progname);
+	fprintf(stderr, "       -S subscribe to channel, print msg to stdout\n");
+	fprintf(stderr, "       -P publish   to channel, read msg from stdin\n");
+	fprintf(stderr, "       default value:\n");
+	fprintf(stderr, "                host: %s\n",def_host);
+	fprintf(stderr, "                port: %s\n",def_port);
 	exit(0);
 }
 int main(int argc, char *argv[]) {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 		perror("socket()");
 		exit(EXIT_FAILURE);
 	}
-	fprintf(stderr,"connecting to %s:%u\n", inet_ntoa(host.sin_addr), ntohs(host.sin_port));
+	fprintf(stderr, "connecting to %s:%u\n", inet_ntoa(host.sin_addr), ntohs(host.sin_port));
 	if (connect(s, (struct sockaddr *) &host, sizeof(host)) == -1) {
 		perror("connect()");
 		exit(EXIT_FAILURE);
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 		break;
 	case S_AUTH:
 		// send auth message
-		fprintf(stderr,"sending authentication...\n");
+		fprintf(stderr, "sending authentication...\n");
 		msg = hpf_msg_auth(nonce, (u_char *) ident, strlen(ident), (u_char *) secret, strlen(secret));
 
 		if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 		break;
 	case S_SUBSCRIBE:
 		// send subscribe message
-		fprintf(stderr,"subscribing to channel...\n");
+		fprintf(stderr, "subscribing to channel...\n");
 		msg = hpf_msg_subscribe((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel));
 
 		if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
@@ -302,8 +302,8 @@ int main(int argc, char *argv[]) {
 		break;
 	case S_PUBLISH:
 		// send publish message
-		fprintf(stderr,"publish to channel...\n");
-		while (1) { 
+		fprintf(stderr, "publish to channel...\n");
+		while (1) {
 			int len;
 			len = read(STDIN_FILENO,buf,MAXLEN);
 			if (len <= 0) {  // end of file
@@ -342,7 +342,7 @@ int main(int argc, char *argv[]) {
 		session_state = S_TERMINATE;
 		break;
 	case S_TERMINATE:
-		fprintf(stderr,"terminated.\n");
+		fprintf(stderr, "terminated.\n");
 		close(s);
 		return EXIT_SUCCESS;
 	default:
