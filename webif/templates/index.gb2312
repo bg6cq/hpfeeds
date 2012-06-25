@@ -15,8 +15,7 @@
 	<h3>欢迎来到 hpfeeds, {{ user.username }}.</h3>
 	{% endif %}
 
-	<p><b>hpfeeds</b>项目实现一个轻量级、支持认证、适合实时数据交换的publish/subscribe协议。
-协议非常简单，容易用各种语言实现。</p>
+	<p><b>hpfeeds</b>项目实现一个轻量级、支持认证、适合实时数据交换的publish/subscribe协议。协议非常简单，容易用各种语言实现。</p>
 	<p>不同的源通过<i>channels(频道)</i>区分，支持任意的二进制载荷。
 channel(频道)的用户可以决定内部使用的数据结构，如可以用一些序列化(serialization)格式。</p>
 	<p>对channel(频道)的访问通过<i>Authkeys</i>认证，Authkeys由一个标识(identifier)和对应的密码(secret)组成。每次认证时，密码(secret)经过hash后传送，以避免被监听泄漏。当然，协议可以在SSL/TLS之上运行。</p>
@@ -35,9 +34,15 @@ channel(频道)的用户可以决定内部使用的数据结构，如可以用一些序列化(serialization)
 	<p>原始项目的代码可以从 <a href="https://github.com/rep/hpfeeds">https://github.com/rep/hpfeeds</a> 获取，<br>
 为了CNGI项目修改的代码可以从 <a href="https://github.com/bg6cq/hpfeeds">https://github.com/bg6cq/hpfeeds</a> 获取。</p>
 	<p>有任何问题和建议，请联系 Zhang Huanjie(james@ustc.edu.cn)。</p>
-	<br />
-	<p>feedbroker 服务端程序运行在10000端口，客户端可以用类似如下命令行访问(请提供相应的channel、identifier、secret信息)</p>
-	<pre>python feed.py --host hpfeeds.ustc.du.cn -p 10000 -c channel -i identifier -s secret subscribe</pre>
+	<p>feedbroker 服务端程序运行在10000端口，客户端可以用类似如下命令行访问(请提供相应的channel、identifier、secret信息)<br>
+	<pre>python feed.py --host hpfeeds.ustc.du.cn -p 10000 -c channel -i identifier -s secret subscribe</pre>	</p>
+	<p>本站设置了一个测试channel(频道), 使用identifier pow1e@hp1 和secret pywoeq0qa9rlqtmg可以进行pub/sub。<br>
+每秒钟发送一个字符串, 可以用以下命令之一接收:<br>
+<pre>
+./hpfdcli -S -h hpfeeds.ustc.edu.cn -p 10000 -i pow1e@hp1 -s pywoeq0qa9rlqtmg -c test
+python feed.py --host hpfeeds.ustc.edu.cn -p 10000 -i pow1e@hp1 -s pywoeq0qa9rlqtmg -c test subscribe
+</pre>
+</p>
       </div>
 
 <div style="float:left;width:220px;">
