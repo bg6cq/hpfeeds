@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load tabs %}
+{% block menubar %}
+{% activetab "menu" "home" %}
+{{ block.super }}
+{% endblock %}
+{% block content %}
+      <div style="float:left;width:640px;margin-right:40px;text-align:justify"> 
+        <h1> 
+          <div class="subtitle">通用、实时、认证</div> 
+          HP Datafeeds
+        </h1>
+	{% if user.is_anonymous %}
+	{% else %}
+	<h3>欢迎来到 hpfeeds, {{ user.username }}.</h3>
+	{% endif %}
+
+	<p><b>hpfeeds</b>项目实现一个轻量级、支持认证、适合实时数据交换的publish/subscribe协议。
+协议非常简单，容易用各种语言实现。</p>
+	<p>不同的源通过<i>channels(频道)</i>区分，支持任意的二进制载荷。
+channel(频道)的用户可以决定内部使用的数据结构，如可以用一些序列化(serialization)格式。</p>
+	<p>对channel(频道)的访问通过<i>Authkeys</i>认证，Authkeys由一个标识(identifier)和对应的密码(secret)组成。每次认证时，密码(secret)经过hash后传送，以避免被监听泄漏。当然，协议可以在SSL/TLS之上运行。</p>
+	<p>每个用户可以创建账户后，通过web界面管理Authkeys。用户仅仅在管理时才需要创建账户，协议使用Authkeys认证。</p>
+
+	{% if user.is_anonymous %}
+<blockquote class="button">
+          <a href="{% url register %}">
+            Register an account now
+          </a>
+</blockquote>
+	{% endif %}
+
+
+	<p>请访问 <a href="http://redmine.honeynet.org/projects/hpfeeds/wiki">hpfeeds Redmine project</a> 获取与协议有关的信息。</p>
+	<p>原始项目的代码可以从 <a href="https://github.com/rep/hpfeeds">https://github.com/rep/hpfeeds</a> 获取，<br>
+为了CNGI项目修改的代码可以从 <a href="https://github.com/bg6cq/hpfeeds">https://github.com/bg6cq/hpfeeds</a> 获取。</p>
+	<p>有任何问题和建议，请联系 Zhang Huanjie(james@ustc.edu.cn)。</p>
+	<br />
+	<p>feedbroker 服务端程序运行在10000端口，客户端可以用类似如下命令行访问(请提供相应的channel、identifier、secret信息)</p>
+	<pre>python feed.py --host hpfeeds.ustc.du.cn -p 10000 -c channel -i identifier -s secret subscribe</pre>
+      </div>
+
+<div style="float:left;width:220px;">
+        <h3 style="">Statistics</h3>
+	<div style="float:right">{{ stats.glastopf_dorks.total }}</div>
+	Glastopf dorks:<br />
+	<div style="float:right">{{ stats.dionaea_capture.total }}</div>
+	Malware captures:<br />
+	<div style="float:right">{{ stats.dionaea_shellcodeprofiles.total }}</div>
+	Shellcodes:<br />
+	<div style="float:right">{{ stats.dionaea_dcerpcrequests.total }}</div>
+	DCERPC requests:<br />
+	<div style="float:right">{{ stats.mwbinary_dionaea_sensorunique.total }}</div>
+	Sensor-unique binaries:<br />
+
+        <br clear="all">
+
+        <h3>Account</h3>
+	{% if user.is_anonymous %}
+        <a style="font-size:13px;" href="{% url log-in %}">Login</a><br />
+        <a style="font-size:13px;" href="{% url register %}">Register</a><br />
+	{% else %}
+	Logged in as {{ user.username }}.<br />
+	<a href="{% url log-out %}">退出</a>
+	{% endif %}
+      </div>
+{% endblock %}
+

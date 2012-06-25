@@ -9,17 +9,17 @@
 {% block content %}
       <div> 
         <h1> 
-          <div class="subtitle">management</div> 
+          <div class="subtitle">管理</div> 
           Channels
         </h1>
 <blockquote class="button">
           <a href="{% url newchan %}">
-            Create a new data channel 禄
+            创建 channel 
           </a>
 </blockquote>
 	<br />
 {% if channels %}
-	<p>You have access to the following channels:</p>
+	<p>可以访问的 channels:</p>
 <table class="list">
 <tr class="head"><th>Channel</th><th>Access</th><th></th></tr>
 {% for c in channels %}<tr class="{% cycle '' 'alt' %}"><td>{{ c.name }}</td><td>{{ c|access_chan_user:user }}</td><td><a href="{% url editchan c.name %}">Edit</a>&nbsp;<a href="{% url deletechan c.name %}">Delete</a></td></tr>
@@ -27,10 +27,10 @@
 </table>
 
 {% else %}
-	<p>You don't have access to any channels.</p>
+	<p>没有任何channels的访问权限.</p>
 {% endif %}
 {% if restchans %}
-	<p>Other channels on this hpfeeds instance:</p>
+	<p>其他的 channels:</p>
 <table class="list">
 <tr class="head"><th>Channel</th><th>Access</th><th></th></tr>
 {% for c in restchans %}<tr class="{% cycle '' 'alt' %}"><td>{{ c.name }}</td><td>{{ c|access_chan_user:user }}</td><td><a href="{% url editchan c.name %}">Edit</a>&nbsp;<a href="{% url deletechan c.name %}">Delete</a></td></tr>

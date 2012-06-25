@@ -18,11 +18,11 @@
     <div class="head">
 {% block menubar %}
       <div class="section{% ifactivetab "menu" "home" %} selected{% else %}{% endifactivetab %}">
-        {% ifactivetab "menu" "home" %}Home{% else %}<a href="{% url index %}">Home</a>{% endifactivetab %}
+        {% ifactivetab "menu" "home" %}首页{% else %}<a href="{% url index %}">首页</a>{% endifactivetab %}
       </div>
 	{% if not user.is_anonymous %}
       <div class="section{% ifactivetab "menu" "users" %} selected{% else %}{% endifactivetab %}">
-	{% ifactivetab "menu" "users" %}Users{% else %}<a href="{% url users %}">Users</a>{% endifactivetab %}
+	{% ifactivetab "menu" "users" %}用户{% else %}<a href="{% url users %}">用户</a>{% endifactivetab %}
       </div>
       <div class="section{% ifactivetab "menu" "channels" %} selected{% else %}{% endifactivetab %}">
 	{% ifactivetab "menu" "channels" %}Channels{% else %}<a href="{% url channels %}">Channels</a>{% endifactivetab %}
@@ -31,7 +31,7 @@
         {% ifactivetab "menu" "authkeys" %}Authkeys{% else %}<a href="{% url authkeys %}">Authkeys</a>{% endifactivetab %}
       </div>
       <div class="section{% ifactivetab "menu" "settings" %} selected{% else %}{% endifactivetab %}">
-        {% ifactivetab "menu" "settings" %}Settings{% else %}<a href="{% url settings %}">Settings</a>{% endifactivetab %}
+        {% ifactivetab "menu" "settings" %}设置{% else %}<a href="{% url settings %}">设置</a>{% endifactivetab %}
       </div>
 	{% endif %}
       <div class="section">
@@ -39,7 +39,7 @@
         <a href="{% url log-in %}">Login</a>
 	{% else %}
 	Logged in as &laquo; {{ user.username }} &raquo; &nbsp;
-	<a href="{% url log-out %}">Logout</a>
+	<a href="{% url log-out %}">退出</a>
 	{% endif %}
       </div>
 {% endblock %}
@@ -63,7 +63,7 @@
     </div> 
  
     <div class="footer"> 
-      Copyright 2012 <a href="http://portal.consesi.ccert.edu.cn/" target=_blank>Consesi Project</a> 
+      Copyright 2012 <a href="http://portal.consesi.ccert.edu.cn/" target=_blank>Consesi项目</a> 
     </div> 
   </body> 
 </html> 
