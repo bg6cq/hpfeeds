@@ -20,12 +20,12 @@
 	<p>不同的源通过<i>channels(频道)</i>区分，支持任意的二进制载荷。
 channel(频道)的用户可以决定内部使用的数据结构，如可以用一些序列化(serialization)格式。</p>
 	<p>对channel(频道)的访问通过<i>Authkeys</i>认证，Authkeys由一个标识(identifier)和对应的密码(secret)组成。每次认证时，密码(secret)经过hash后传送，以避免被监听泄漏。当然，协议可以在SSL/TLS之上运行。</p>
-	<p>每个用户可以创建账户后，通过web界面管理Authkeys。用户仅仅在管理时才需要创建账户，协议使用Authkeys认证。</p>
+	<p>使用者可以创建账户后，通过web界面管理Authkeys。使用者仅仅在管理时才需要创建账户，协议本身使用Authkeys认证。</p>
 
 	{% if user.is_anonymous %}
 <blockquote class="button">
           <a href="{% url register %}">
-            Register an account now
+            注册一个新账户
           </a>
 </blockquote>
 	{% endif %}
@@ -55,7 +55,7 @@ channel(频道)的用户可以决定内部使用的数据结构，如可以用一些序列化(serialization)
 
         <br clear="all">
 
-        <h3>Account</h3>
+        <h3>账户</h3>
 	{% if user.is_anonymous %}
         <a style="font-size:13px;" href="{% url log-in %}">Login</a><br />
         <a style="font-size:13px;" href="{% url register %}">Register</a><br />

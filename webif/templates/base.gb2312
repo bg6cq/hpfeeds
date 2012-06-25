@@ -22,7 +22,7 @@
       </div>
 	{% if not user.is_anonymous %}
       <div class="section{% ifactivetab "menu" "users" %} selected{% else %}{% endifactivetab %}">
-	{% ifactivetab "menu" "users" %}用户{% else %}<a href="{% url users %}">用户</a>{% endifactivetab %}
+	{% ifactivetab "menu" "users" %}帐户{% else %}<a href="{% url users %}">帐户</a>{% endifactivetab %}
       </div>
       <div class="section{% ifactivetab "menu" "channels" %} selected{% else %}{% endifactivetab %}">
 	{% ifactivetab "menu" "channels" %}Channels{% else %}<a href="{% url channels %}">Channels</a>{% endifactivetab %}
