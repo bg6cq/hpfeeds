@@ -282,7 +282,8 @@ int main(int argc, char *argv[]) {
 				perror("write()");
 				exit(EXIT_FAILURE);
 			}
-			putchar('\n');
+			// if( (payload_len>=1) && (data[hpf_msg_getsize(msg) - 1] != '\n')) write(STDOUT_FILENO,"\n", 1);
+			// putchar('\n');
 			
 			free(data);
 
@@ -307,10 +308,11 @@ int main(int argc, char *argv[]) {
 				close(s);
 				return EXIT_SUCCESS;
 			}
-			if(buf[len - 1] == '\n') {
+		/*	if(buf[len - 1] == '\n') {
 				buf[len - 1] = 0;
 				len --;
-			}
+			} 
+		*/
 			msg = hpf_msg_publish((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel),buf,len);
 			if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
 				perror("write()");
