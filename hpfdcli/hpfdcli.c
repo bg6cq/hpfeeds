@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #define MAXLEN 32768
 
@@ -48,11 +49,61 @@ C_SUBSCRIBE,
 C_PUBLISH,
 C_UNKNOWN } cmd_t;
 
+ssize_t                     /* Read "n" bytes from a descriptor. */
+readn(int fd, void *vptr, size_t n)
+{
+    size_t  nleft;
+    ssize_t nread;
+    char    *ptr;
+
+    ptr = vptr;
+    nleft = n;
+    while (nleft > 0) {
+        if ( (nread = read(fd, ptr, nleft)) < 0) {
+            if (errno == EINTR)
+                nread = 0;      /* and call read() again */
+            else
+                return(-1);
+        } else if (nread == 0)
+            break;              /* EOF */
+
+        nleft -= nread;
+        ptr   += nread;
+        }
+    return(n - nleft);      /* return >= 0 */
+}
+/* end readn */
+
+ssize_t         /* Write "n" bytes to a descriptor. */
+writen(int fd, const void *vptr, size_t n)
+{
+    size_t      nleft;
+    ssize_t     nwritten;
+    const char  *ptr;
+
+    ptr = vptr;
+    nleft = n;
+    while (nleft > 0) {
+        if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
+            if (errno == EINTR)
+                nwritten = 0;       /* and call write() again */
+            else
+                return(-1);         /* error */
+        }
+
+        nleft -= nwritten;
+        ptr   += nwritten;
+    }
+    return(n);
+}
+/* end writen */
+
+
 u_char *read_msg(int s) {
 	u_char *buffer;
 	u_int32_t msglen;
 
-	if (read(s, &msglen, 4) != 4) {
+	if (readn(s, &msglen, 4) != 4) {
 		perror("read()");
 		exit(EXIT_FAILURE);
 	}
@@ -65,7 +116,7 @@ u_char *read_msg(int s) {
 	*(u_int32_t *) buffer = msglen;
 	msglen = ntohl(msglen);
 
-	if (read(s, buffer + 4, msglen - 4) != (msglen - 4)) {
+	if (readn(s, buffer + 4, msglen - 4) != (msglen - 4)) {
 		perror("read()");
 		exit(EXIT_FAILURE);
 	}
@@ -230,7 +281,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "sending authentication...\n");
 		msg = hpf_msg_auth(nonce, (u_char *) ident, strlen(ident), (u_char *) secret, strlen(secret));
 
-		if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
+		if (writen(s, (u_char *) msg, ntohl(msg->hdr.msglen)) != ntohl(msg->hdr.msglen)) {
 			perror("write()");
 			exit(EXIT_FAILURE);
 		}
@@ -246,7 +297,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "subscribing to channel...\n");
 		msg = hpf_msg_subscribe((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel));
 
-		if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
+		if (writen(s, (u_char *) msg, ntohl(msg->hdr.msglen)) != ntohl(msg->hdr.msglen)) {
 			perror("write()");
 			exit(EXIT_FAILURE);
 		}
@@ -300,7 +351,7 @@ int main(int argc, char *argv[]) {
 		break;
 	case S_PUBLISH:
 		// send publish message
-		fprintf(stderr, "publish to channel...\n");
+		fprintf(stderr, "publish to channel (%s)...\n",channel);
 		while (1) {
 			int len;
 			len = read(STDIN_FILENO,buf,MAXLEN);
@@ -314,7 +365,7 @@ int main(int argc, char *argv[]) {
 			} 
 		*/
 			msg = hpf_msg_publish((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel),buf,len);
-			if (write(s, (u_char *) msg, ntohl(msg->hdr.msglen)) == -1) {
+			if (writen(s, (u_char *) msg, ntohl(msg->hdr.msglen)) != ntohl(msg->hdr.msglen)) {
 				perror("write()");
 				exit(EXIT_FAILURE);
 			}
