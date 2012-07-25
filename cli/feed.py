@@ -49,8 +49,9 @@ def main(opts, action, pubdata=None):
 		hpc.publish(opts.channels, pubdata)
 
 	elif action == 'sendfile':
-		pubfile = open(pubdata, 'rb').read()
-		hpc.publish(opts.channels, pubfile)
+		pubfile = open(pubdata, 'rb')
+		for line in pubfile.readlines():
+			hpc.publish(opts.channels, line)
 
 	log('closing connection.')
 	hpc.close()
