@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
 		break;
 	case S_SUBSCRIBE:
 		// send subscribe message
-		fprintf(stderr, "subscribing to channel...\n");
+		fprintf(stderr, "subscribing to channel (%s)...\n",channel);
 		msg = hpf_msg_subscribe((u_char *) ident, strlen(ident), (u_char *) channel, strlen(channel));
 
 		if (writen(s, (u_char *) msg, ntohl(msg->hdr.msglen)) != ntohl(msg->hdr.msglen)) {
@@ -378,11 +378,11 @@ int main(int argc, char *argv[]) {
 	case S_ERROR:
 		if (msg) {
 			// msg is still valid
-			if ((errmsg = calloc(1, msg->hdr.msglen - sizeof(msg->hdr))) == NULL) {
+			if ((errmsg = calloc(1, ntohl(msg->hdr.msglen) - sizeof(msg->hdr))) == NULL) {
 				perror("calloc()");
 				exit(EXIT_FAILURE);
 			}
-			memcpy(errmsg, msg->data, msg->hdr.msglen - sizeof(msg->hdr));
+			memcpy(errmsg, msg->data, ntohl(msg->hdr.msglen) - sizeof(msg->hdr));
 
 			fprintf(stderr, "server error: '%s'\n", errmsg);
 			free(errmsg);
