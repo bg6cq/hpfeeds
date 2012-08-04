@@ -26,6 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <linux/tcp.h>
 
 #define MAXLEN 32768
 
@@ -156,6 +157,7 @@ int main(int argc, char *argv[]) {
 	u_int32_t nonce = 0;
 	u_int32_t payload_len;
 	char buf[MAXLEN];
+	int flag;
 
 	hpfdcmd = C_UNKNOWN;
 	channel = ident = secret = NULL;
@@ -241,6 +243,9 @@ int main(int argc, char *argv[]) {
 		perror("connect()");
 		exit(EXIT_FAILURE);
 	}
+
+	flag = 1;  
+	setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int)); 
 
 	session_state = S_INIT; // initial session state
 
